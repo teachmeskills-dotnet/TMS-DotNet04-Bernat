@@ -31,8 +31,8 @@ namespace GazeControl
         bool useMarkers;
         Rectangle[] foundObject;
         private static CascadeClassifier classifierEye = new CascadeClassifier("cascadeEye.xml");
-        private static CascadeClassifier classifierPulp = new CascadeClassifier("lastPulp.xml");
-        private static CascadeClassifier classifierMarker = new CascadeClassifier("stickWhite.xml");
+        private static CascadeClassifier classifierPulp = new CascadeClassifier("cascadePulp.xml");
+        private static CascadeClassifier classifierMarker = new CascadeClassifier("markerWhite.xml");
         FilterInfoCollection filter;
         VideoCaptureDevice device;
         private void Form1_Load(object sender, EventArgs e)
@@ -58,12 +58,13 @@ namespace GazeControl
                 {
                     var cutImage = ImageProccesing.CutImage(frameBitmap, foundObject.First());
                     foundObject = FindObject(cutImage, classifierPulp, 5);
+                    pictureBox1.Image = frameBitmap;
 
                     if (foundObject.Length != 0)
                     {
                         var centerX2 = foundObject.First().X + foundObject.First().Width / 2;
                         var centerY2 = foundObject.First().Y + foundObject.First().Height / 2;
-                        ImageProccesing.CircleAnObject(cutImage, foundObject.First());
+                        ImageProccesing.CircleAnObject(cutImage, foundObject.First(), Color.Red, 1);
                         CursorControlByEmgu(centerX2, centerY2, cutImage, sensitivity, range);
                     }
                 }
@@ -94,29 +95,17 @@ namespace GazeControl
                 foundObject = FindObject(frameBitmap, classifierMarker, 5);
                 if (foundObject.Length != 0)
                 {
-                    using (Graphics graphics = Graphics.FromImage(frameBitmap))
+                    if (foundObject.First().Width < 80)
                     {
-                        if (foundObject.First().Width < 80)
-                        {
-                            using (Pen pen = new Pen(Color.Red, 5))
-                            {
-                                graphics.DrawEllipse(pen, foundObject.First());
-                            }
-                        }
-                        else if (foundObject.First().Width > 80 && foundObject.First().Width < 160)
-                        {
-                            using (Pen pen = new Pen(Color.Black, 5))
-                            {
-                                graphics.DrawEllipse(pen, foundObject.First());
-                            }
-                        }
-                        else if (foundObject.First().Width > 160)
-                        {
-                            using (Pen pen = new Pen(Color.Blue, 5))
-                            {
-                                graphics.DrawEllipse(pen, foundObject.First());
-                            }
-                        }
+                        ImageProccesing.CircleAnObject(frameBitmap, foundObject.First(), Color.Red, 5);
+                    }
+                    else if (foundObject.First().Width > 80 && foundObject.First().Width < 160)
+                    {
+                        ImageProccesing.CircleAnObject(frameBitmap, foundObject.First(), Color.Black, 5);
+                    }
+                    else if (foundObject.First().Width > 160)
+                    {
+                        ImageProccesing.CircleAnObject(frameBitmap, foundObject.First(), Color.Blue, 5);
                     }
                 }
                 pictureBox1.Image = frameBitmap;
@@ -170,7 +159,7 @@ namespace GazeControl
             {
                 Cursor.Position = new Point(Cursor.Position.X - sensitivity, Cursor.Position.Y - 0);
             }
-            pictureBox1.Image = image;
+            pictureBox2.Image = image;
         }
 
         public string GetPredictionResult(ModelInput sampleData)
@@ -191,7 +180,7 @@ namespace GazeControl
             if (brightnessValue < 255)
             {
                 brightnessValue += 5;
-                label1.Text = $"bright: {brightnessValue}";
+                label1.Text = $"Bright: {brightnessValue}";
             }
         }
 
@@ -200,12 +189,21 @@ namespace GazeControl
             if (brightnessValue > 0)
             {
                 brightnessValue -= 5;
-                label1.Text = $"bright: {brightnessValue}";
+                label1.Text = $"Bright: {brightnessValue}";
             }
         }
 
         private void UseML_Click(object sender, EventArgs e)
         {
+            pictureBox2.Visible = false;
+            setSensevity.Visible = false;
+            rangeMinus.Visible = false;
+            rangePlus.Visible = false;
+            label2.Visible = false;
+            StartEmgu.Visible = false;
+            label1.Visible = true;
+            brightMinus.Visible = true;
+            brightPlus.Visible = true;
             if (useMlNet == false)
             {
                 getContours = false;
@@ -221,6 +219,15 @@ namespace GazeControl
 
         private void UseEmgu_Click(object sender, EventArgs e)
         {
+            pictureBox2.Visible = true;
+            setSensevity.Visible = true;
+            rangeMinus.Visible = true;
+            rangePlus.Visible = true;
+            label2.Visible = true;
+            StartEmgu.Visible = true;
+            label1.Visible = false;
+            brightMinus.Visible = false;
+            brightPlus.Visible = false;
             if (useEmgu == false)
             {
                 useMlNet = false;
@@ -241,7 +248,7 @@ namespace GazeControl
                 if (range <= 50)
                 {
                     range += 1;
-                    label2.Text = $"range: {range} px";
+                    label2.Text = $"Range: {range} px";
                 }
             }
         }
@@ -253,7 +260,7 @@ namespace GazeControl
                 if (range != 0)
                 {
                     range -= 1;
-                    label2.Text = $"range: {range} px";
+                    label2.Text = $"Range: {range} px";
                 }
             }
         }
@@ -272,6 +279,15 @@ namespace GazeControl
 
         private void ShowContours_Click(object sender, EventArgs e)
         {
+            pictureBox2.Visible = false;
+            StartEmgu.Visible = false;
+            setSensevity.Visible = false;
+            rangeMinus.Visible = false;
+            rangePlus.Visible = false;
+            label2.Visible = false;
+            label1.Visible = false;
+            brightMinus.Visible = false;
+            brightPlus.Visible = false;
             if (getContours == false)
             {
                 useMlNet = false;
@@ -287,6 +303,15 @@ namespace GazeControl
 
         private void UseMarker_Click(object sender, EventArgs e)
         {
+            pictureBox2.Visible = false;
+            StartEmgu.Visible = false;
+            setSensevity.Visible = false;
+            rangeMinus.Visible = false;
+            rangePlus.Visible = false;
+            label2.Visible = false;
+            label1.Visible = false;
+            brightMinus.Visible = false;
+            brightPlus.Visible = false;
             if (useMarkers == false)
             {
                 useMlNet = false;
@@ -298,6 +323,11 @@ namespace GazeControl
             {
                 useMarkers = false;
             }
+        }
+
+        private void setSensitivity_Scroll(object sender, EventArgs e)
+        {
+            sensitivity = setSensevity.Value;
         }
     }
 }

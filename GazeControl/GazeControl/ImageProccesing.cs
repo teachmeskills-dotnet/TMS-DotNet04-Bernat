@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Linq;
 
 namespace GazeControl
 {
@@ -13,15 +12,14 @@ namespace GazeControl
             postImg.Save("ProcessImg.jpg");
             return postImg;
         }
-        public static Image CircleAnObject (Bitmap bmp, Rectangle rectangle)
+        public static Image CircleAnObject (Bitmap bmp, Rectangle rectangle, Color color, int widht)
         {
             using (Graphics graphics = Graphics.FromImage(bmp))
             {
-                using (Pen pen = new Pen(Color.Red, 0))
+                using (Pen pen = new Pen(color, widht))
                 {
                     graphics.DrawEllipse(pen, rectangle);
                 }
-
             }
             return bmp;
         }
