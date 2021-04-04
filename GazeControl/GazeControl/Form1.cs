@@ -210,6 +210,7 @@ namespace GazeControl
             {
                 getContours = false;
                 useEmgu = false;
+                useMarkers = false;
                 useMlNet = true;
             }
             else
@@ -224,6 +225,7 @@ namespace GazeControl
             {
                 useMlNet = false;
                 getContours = false;
+                useMarkers = false;
                 useEmgu = true;
             }
             else
@@ -274,6 +276,7 @@ namespace GazeControl
             {
                 useMlNet = false;
                 useEmgu = false;
+                useMarkers = false;
                 getContours = true;
             }
             else
